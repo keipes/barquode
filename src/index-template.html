@@ -12,22 +12,18 @@
             <h1><a href="." title="Click me to reset everything!">barquo/de</a></h1>
         </div>
         <div class="item">
-            <div class="barcode">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1.469in" height="0.9in" viewBox="0 0 113 100" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="113" height="100" fill="white"/>
-                </svg>
-            </div>
+            <div class="barcode" id="barcode"></div>
         </div>
         <div class="item">
             <input type="number" name="" id="bc" max="9999999999999" placeholder="digits go here, use the slider to scale">
         </div>
         <div class="item">
-            <input type="range" min="80" max="200" value="100" class="slider" id="bc-size">
+            <input type="range" min="0.8" max="2" value="2" step=".01" class="slider" id="bc-size">
         </div>
         <div class="item">
             <div class="button-row">
-                <button class="button" id="btn-reset">Clear Barcode</button>
-                <button class="button" id="btn-reset-scale">Reset Scale</button>
+<!--                <button class="button" id="btn-reset">Clear Barcode</button>-->
+<!--                <button class="button" id="btn-reset-scale">Reset Scale</button>-->
                 <button class="button" id="btn-download-svg">Download SVG</button>
             </div>
         </div>
@@ -42,6 +38,6 @@
         </div>
     </div>
 </div>
-    <script><!-- {{{ script }}} --></script>
+    <script type="module"><!-- {{{ script }}} --></script>
 </body>
 </html>

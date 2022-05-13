@@ -1,52 +1,38 @@
-// SVG
-const svg = document.getElementsByTagName("svg")[0];
-const nominalWidth = 1.469;
-const nominalHeight = 0.9;
+const ns = 'http://www.w3.org/2000/svg';
 
-function adjustSvgScale(scaleNum) {
-    svg.setAttribute("width", (scaleNum * nominalWidth / 100).toString() + "in");
-    svg.setAttribute("height", (scaleNum * nominalHeight / 100).toString() + "in");
-}
+let scale = 2;
+const svg = document.createElementNS(ns, 'svg');
+const svgS = svg.setAttribute.bind(svg);
+svgS('xmlns', ns);
+svgS('width', `${1.469 * scale}in`);
+svgS('height', `${0.9 * scale}in`);
+svgS('viewBox', '0 0 113 100');
+svgS('preserveAspectRatio', 'none');
 
-// Get and set query string params.
-function query(label: string, q: string = undefined): string {
-    const params = new URLSearchParams(window.location.search);
-    if (typeof q === 'undefined') {
-        return params.get(label);
-    } else {
-        params.set(label, q);
-        const newRelativePathQuery = window.location.pathname + '?' + params.toString();
-        history.pushState(null, '', newRelativePathQuery);
-        return q;
-    }
-}
+const getRect = (x, y, width, height, color) => {
+    const rect = document.createElementNS(ns, 'rect');
+    const rs = rect.setAttribute.bind(rect);
+    rs('x', x);
+    rs('y', y);
+    rs('width', width);
+    rs('height', height);
+    rs('fill', color);
+    svg.appendChild(rect);
+    return rect;
+};
 
-function handleBarcode(code: string) {
-    if (code.length < 12) {
-        let padded = code.padEnd(12, '0');
-        setSvgBars(upca(padded.split('').map(Number)));
-        return;
-    } else if (code.length == 13) {
-        setSvgBars(ean13(code.split('').map(Number)));
-        return;
-    } else {
-        alert('barcode too long');
-        return;
-    }
-}
+let backgroundRect = getRect(0, 0, 113, 100, 'white');
+document.getElementById("barcode").appendChild(svg);
 
-// # Barcode Input
-const barcodeInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
-// Get initial value from query params.
-const initialBarcodeValue = parseInt(query('q'));
-if (!isNaN(initialBarcodeValue)) {
-    barcodeInput.value = initialBarcodeValue.toString();
-    handleBarcode(initialBarcodeValue.toString());
-}
-// Attach listener.
-barcodeInput.addEventListener('input', (e: InputEvent) => {
-    handleBarcode(barcodeInput.value);
-    query('q', barcodeInput.value);
+const listen = (id: string, t: string, cb) => document.getElementById(id).addEventListener(t, cb);
+
+const bcI: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
+bcI.focus();
+
+listen('bc-size', 'input', e => {
+    scale = parseFloat(e.target.value);
+    svgS('width', `${1.469 * scale}in`);
+    svgS('height', `${0.9 * scale}in`);
 });
 
 // GS1 Release 22, Section 5.2.1.2.1, "Symbol character encodation"
@@ -74,196 +60,120 @@ const characterSets = {
     7: [0, 1, 0, 1, 0, 1],
     8: [0, 1, 0, 1, 1, 0],
     9: [0, 1, 1, 0, 1, 0],
+};
+
+/*
+Each number has two bars and two blanks, but we only need to draw the blanks so only two slots are stored.
+
+rects {
+0: first guard bar
+1: second guard bar
+2,3: first digit
+4,5: second digit
+6,7: third digit
+8,9: fourth digit
+10,11: fifth digit
+12,13: sixth digit
+14: first middle guard bar
+15: second middle guard bar
+16,17: seventh digit
+18, 19: eighth digit
+20, 21: ninth digit
+22, 23: tenth digit
+24, 25: eleventh digit
+27, 28: twelfth digit
+29: first end guard bar
+30: second end guard bar
 }
-// 5.2.3.4 Quiet Zone
+ */
+const rects = [...Array(24).keys()].map(_ => getRect(0,0, 0, 100, 'black'));
+// left guard bar
+getRect(12, 0, 1, 100, 'black');
+getRect(14, 0, 1, 100, 'black');
+// middle guard
+getRect(57, 0, 1, 100, 'black');
+getRect(59, 0, 1, 100, 'black');
+// right guard bar
+getRect(101, 0, 1, 100, 'black');
+getRect(103, 0, 1, 100, 'black');
 
-class Code {
-    elements: number[];
-
-    constructor() {
-        this.elements = [];
-    }
-
-    addSpace(length: number) {
-        for (let i = 0; i < length; i++) {
-            this.elements.push(0);
-        }
-    }
-
-    addBar(length: number) {
-        for (let i = 0; i < length; i++) {
-            this.elements.push(1);
-        }
-    }
-
-    addGuard() {
-        this.elements.push(1, 0, 1);
-    }
-
-    addCenterGuard() {
-        this.elements.push(0, 1, 0, 1, 0);
-    }
-
-    addAPattern(digits: number[]) {
-        if (digits.length !== 4) {
-            alert("broken");
-            return;
-        }
-        this.addSpace(digits[0]);
-        this.addBar(digits[1]);
-        this.addSpace(digits[2]);
-        this.addBar(digits[3]);
-    }
-
-    addCPattern(digits: number[]) {
-        if (digits.length !== 4) {
-            alert("broken");
-            return;
-        }
-        this.addBar(digits[0]);
-        this.addSpace(digits[1]);
-        this.addBar(digits[2]);
-        this.addSpace(digits[3]);
-    }
+const digitStart = (index) => {
+    // offset by quiet space, left guard, prior digits
+    let offset = 11 + 3 + (index * 7);
+    // add middle guard width for upper six digits
+    if (index > 5) offset += 5;
+    return offset;
+}
+for (let i = 0; i < 12; i++) {
+    console.log(`${i} ${digitStart(i)}`)
 }
 
-function ean13(digits: number[]): Code {
-    if (digits.length !== 13) {
-        alert("broken");
-        return;
-    }
-    let code = new Code();
-    code.addSpace(11); // leading quiet zone
-    code.addGuard();
-    // Left numbers from set A or B.
-    const sets = characterSets[digits[0]];
-    for (let i = 1; i < 7; i++) {
-        let toEncode = digits[i];
-        // use set A or B?
-        let set = sets[i - 1];
-        if (set === 0) {
-            // set A
-            code.addAPattern(encoding[toEncode]);
-        } else {
-            // set B
-            code.addAPattern(encoding[toEncode].slice().reverse());
-        }
-    }
-    code.addCenterGuard();
-    // Right numbers from set C.
-    for (let i = 7; i < 13; i++) {
-        console.log(digits[i]);
+const uRect = (index, key, val) => {
+    rects[index].setAttribute(key, val);
+};
 
-        code.addCPattern(encoding[digits[i]]);
+const setDigit = (index, value, special) => {
+    console.log(`${index} ${value} ${special}`);
+    // "special" is the extra character encoded in ean13
+    // a value of 0 generates a valid UPCA barcode
+    let i = index > 5 ? index - 5 : index;
+    let aBMask = (index > 5) ? characterSets[0] : characterSets[special];
+    let encoded = encoding[value].slice();
+    if (index < 6 && aBMask[i] === 1) encoded.reverse();
+    let startX: number = digitStart(index);
+
+    let barOneIdx = index * 2;
+    let barTwoIdx = barOneIdx + 1;
+
+    if (index > 5) {
+        // 0
+        uRect(barOneIdx, 'x', startX);
+        uRect(barOneIdx, 'width', encoded[0]);
+        // 2
+        uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1]);
+        uRect(barTwoIdx, 'width', encoded[2]);
+    } else {
+        // 1
+        uRect(barOneIdx, 'x', startX + encoded[0]);
+        uRect(barOneIdx, 'width', encoded[1]);
+        // 3
+        uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1] + encoded[2]);
+        uRect(barTwoIdx, 'width', encoded[3]);
     }
-    code.addGuard();
-    code.addSpace(7); // trailing quiet zone
-    return code;
+};
+
+const clearDigit = index => {
+    let barOneIdx = index * 2;
+    let barTwoIdx = (index * 2) + 1;
+    uRect(barOneIdx, 'x', 0);
+    uRect(barOneIdx, 'width', 0);
+    uRect(barTwoIdx, 'x', 0);
+    uRect(barTwoIdx, 'width', 0);
 }
 
-function upca(digits: number[]) {
-    let code = new Code();
-    code.addSpace(9); // leading quiet zone
-    code.addGuard();
-    // Left numbers from set A or B.
-    const sets = characterSets[digits[0]];
-    for (let i = 0; i < 6; i++) {
-        code.addAPattern(encoding[digits[i]]);
+const maxLength = 13;
+listen('bc', 'input', e => {
+    if (e.target.value.length > maxLength) {
+        e.target.value = e.target.value.slice(0, maxLength);
     }
-    code.addCenterGuard();
-    // Right numbers from set C.
-    for (let i = 6; i < 12; i++) {
-        console.log(digits[i]);
-
-        code.addCPattern(encoding[digits[i]]);
-    }
-    code.addGuard();
-    code.addSpace(9); // trailing quiet zone
-
-    return code;
-
-
-}
-
-function ean8() {
-    let code = new Code();
-    code.addSpace(7); // leading quiet zone
-
-
-    code.addSpace(7); // trailing quiet zone
-}
-
-function upce() {
-    let code = new Code();
-    code.addSpace(9); // leading quiet zone
-
-
-    code.addSpace(7); // trailing quiet zone
-}
-
-// 5.2.5 Human readable interpretation
-
-// Update SVG
-function setSvgBars(code: Code) {
-    let output = '<rect x="0" y="0" width="113" height="100" fill="white"/>';
-    const elements = code.elements;
-    let prevColor = 0;
-    let startX = 0;
-    for (let i = 0; i < elements.length; i++) {
-        let curColor = elements[i];
-        if (curColor !== prevColor) {
-            if (prevColor === 1) {
-                output += `<rect x="${startX}" y="0" width="${i - startX}" height="100" fill="black"/>`
-            }
-            startX = i;
-            prevColor = curColor;
-        }
-    }
-    svg.innerHTML = output;
-}
-
-// # Slider Input
-const sliderInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc-size');
-// Get initial value from query params.
-const initialSliderValue = parseInt(query('s'));
-if (isNaN(initialSliderValue) || initialSliderValue < 80 || initialSliderValue > 200) {
-    sliderInput.value = "100";
-} else {
-    sliderInput.value = initialSliderValue.toString();
-    adjustSvgScale(initialSliderValue);
-}
-// Attach listener.
-sliderInput.addEventListener('input', (e: InputEvent) => {
-    const scale = sliderInput.value;
-    // const scaleNum = parseInt(scale);
-    adjustSvgScale(parseInt(scale));
-    query('s', sliderInput.value);
+    updateBarcode(e.target.value);
 });
 
-// # Buttons
-// Reset button
-const resetButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset');
-resetButton.addEventListener('click', (e: MouseEvent) => {
-    barcodeInput.value = "";
-    query('q', "");
-    // console.log(e);
-});
-// Reset scale button
-const resetScaleButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset-scale');
-resetScaleButton.addEventListener('click', (e: MouseEvent) => {
-    adjustSvgScale(100);
-    sliderInput.value = "100";
-    query('s', "100");
-});
-// Download button
-const downloadSvgButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-download-svg');
-downloadSvgButton.addEventListener('click', (e: MouseEvent) => {
-    console.log(e);
-});
-
-
-
-console.log("loaded");
-console.log(ean13("9501101531000".split('').map(Number)).elements);
-
-setSvgBars(ean13("9501101531000".split('').map(Number)));
+let currentBarcode = "";
+const updateBarcode = barcode => {
+    let special = 0;
+    let curDigits = currentBarcode.split('').map(Number);
+    let digits = barcode.split('').map(Number);
+    if (barcode.length === 13) {
+        special = digits[0];
+        digits = digits.slice(1);
+    }
+    for (const [i, value] of digits.entries()) {
+        if (curDigits[i] !== value) {
+            setDigit(i, value, special);
+        }
+    }
+    for (let i = digits.length; i < 12; i++) {
+        clearDigit(i);
+    }
+};
