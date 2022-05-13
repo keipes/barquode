@@ -21,22 +21,7 @@ function query(label: string, q: string = undefined): string {
     }
 }
 
-// # Barcode Input
-const barcodeInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
-// Get initial value from query params.
-const initialBarcodeValue = parseInt(query('q'));
-if (!isNaN(initialBarcodeValue)) {
-    barcodeInput.value = initialBarcodeValue.toString();
-    handleBarcode(initialBarcodeValue.toString());
-}
-// Attach listener.
-barcodeInput.addEventListener('input', (e: InputEvent) => {
-    handleBarcode(barcodeInput.value);
-    query('q', barcodeInput.value);
-});
-
 function handleBarcode(code: string) {
-    let newCode: string = code;
     if (code.length < 12) {
         let padded = code.padEnd(12, '0');
         setSvgBars(upca(padded.split('').map(Number)));
@@ -50,45 +35,18 @@ function handleBarcode(code: string) {
     }
 }
 
-// # Slider Input
-const sliderInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc-size');
+// # Barcode Input
+const barcodeInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
 // Get initial value from query params.
-const initialSliderValue = parseInt(query('s'));
-if (isNaN(initialSliderValue) || initialSliderValue < 80 || initialSliderValue > 200) {
-    sliderInput.value = "100";
-} else {
-    sliderInput.value = initialSliderValue.toString();
-    adjustSvgScale(initialSliderValue);
+const initialBarcodeValue = parseInt(query('q'));
+if (!isNaN(initialBarcodeValue)) {
+    barcodeInput.value = initialBarcodeValue.toString();
+    handleBarcode(initialBarcodeValue.toString());
 }
 // Attach listener.
-sliderInput.addEventListener('input', (e: InputEvent) => {
-    const scale = sliderInput.value;
-    // const scaleNum = parseInt(scale);
-    adjustSvgScale(parseInt(scale));
-    query('s', sliderInput.value);
-});
-
-console.log(typeof document.getElementById('btn-reset'));
-// # Buttons
-// Reset button
-const resetButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset');
-resetButton.addEventListener('click', (e: MouseEvent) => {
-    barcodeInput.value = "";
-    query('q', "");
-    // console.log(e);
-});
-// Reset scale button
-const resetScaleButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset-scale');
-resetScaleButton.addEventListener('click', (e: MouseEvent) => {
-    adjustSvgScale(100);
-    sliderInput.value = "100";
-    query('s', "100");
-});
-// Download button
-
-const downloadSvgButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-download-svg');
-downloadSvgButton.addEventListener('click', (e: MouseEvent) => {
-    console.log(e);
+barcodeInput.addEventListener('input', (e: InputEvent) => {
+    handleBarcode(barcodeInput.value);
+    query('q', barcodeInput.value);
 });
 
 // GS1 Release 22, Section 5.2.1.2.1, "Symbol character encodation"
@@ -245,7 +203,6 @@ function upce() {
 
 // 5.2.5 Human readable interpretation
 
-
 // Update SVG
 function setSvgBars(code: Code) {
     let output = '<rect x="0" y="0" width="113" height="100" fill="white"/>';
@@ -264,6 +221,46 @@ function setSvgBars(code: Code) {
     }
     svg.innerHTML = output;
 }
+
+// # Slider Input
+const sliderInput: HTMLInputElement = <HTMLInputElement> document.getElementById('bc-size');
+// Get initial value from query params.
+const initialSliderValue = parseInt(query('s'));
+if (isNaN(initialSliderValue) || initialSliderValue < 80 || initialSliderValue > 200) {
+    sliderInput.value = "100";
+} else {
+    sliderInput.value = initialSliderValue.toString();
+    adjustSvgScale(initialSliderValue);
+}
+// Attach listener.
+sliderInput.addEventListener('input', (e: InputEvent) => {
+    const scale = sliderInput.value;
+    // const scaleNum = parseInt(scale);
+    adjustSvgScale(parseInt(scale));
+    query('s', sliderInput.value);
+});
+
+// # Buttons
+// Reset button
+const resetButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset');
+resetButton.addEventListener('click', (e: MouseEvent) => {
+    barcodeInput.value = "";
+    query('q', "");
+    // console.log(e);
+});
+// Reset scale button
+const resetScaleButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-reset-scale');
+resetScaleButton.addEventListener('click', (e: MouseEvent) => {
+    adjustSvgScale(100);
+    sliderInput.value = "100";
+    query('s', "100");
+});
+// Download button
+const downloadSvgButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-download-svg');
+downloadSvgButton.addEventListener('click', (e: MouseEvent) => {
+    console.log(e);
+});
+
 
 
 console.log("loaded");
