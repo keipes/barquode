@@ -83,6 +83,14 @@ h1>a {
     flex-flow: row wrap;
     justify-content: space-around;
 }
+svg {
+    width: calc(100% - 4rem);
+    /*transition: viewBox 1s ease-in-out 1s;*/
+}
+
+rect {
+    transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;
+}
 
 .button {
     background-color: #191013;
