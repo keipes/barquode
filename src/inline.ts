@@ -62,30 +62,6 @@ const characterSets = {
     9: [0, 1, 1, 0, 1, 0],
 };
 
-/*
-Each number has two bars and two blanks, but we only need to draw the blanks so only two slots are stored.
-
-rects {
-0: first guard bar
-1: second guard bar
-2,3: first digit
-4,5: second digit
-6,7: third digit
-8,9: fourth digit
-10,11: fifth digit
-12,13: sixth digit
-14: first middle guard bar
-15: second middle guard bar
-16,17: seventh digit
-18, 19: eighth digit
-20, 21: ninth digit
-22, 23: tenth digit
-24, 25: eleventh digit
-27, 28: twelfth digit
-29: first end guard bar
-30: second end guard bar
-}
- */
 const rects = [...Array(24).keys()].map(_ => getRect(0,0, 0, 100, 'black'));
 // left guard bar
 getRect(12, 0, 1, 100, 'black');
