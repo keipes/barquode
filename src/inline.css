@@ -84,7 +84,7 @@ h1>a {
     justify-content: space-around;
 }
 svg {
-    width: calc(100% - 4rem);
+    /*width: calc(100% - 4rem);*/
     /*transition: viewBox 1s ease-in-out 1s;*/
 }
 

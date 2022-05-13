@@ -26,3 +26,7 @@ npm run watch
 
 ### View
 I'm using IntelliJ's built in web browser to host build/web/index.html and viewing in Chrome.
+
+### Attribution
+
+OCR-B digit glyphs adapted from "ocrb" by Matthew Anderson. License [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). Site [archive](https://web.archive.org/web/20190328165040/https://wehtt.am/ocr-b/), [original](https://wehtt.am/ocr-b/).
