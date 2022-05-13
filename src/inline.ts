@@ -1,16 +1,4 @@
 /*
-TODO: Character width adjustments for 1,2, 7, 8
-5.2.3.1 Nominal dimensions of characters
-[...]
-The width of each bar (dark bar) and space (light bar) is determined by multiplying the X-dimension
-by the module width of each bar (dark bar) and space (light bar) (1, 2, 3 or 4). There is an
-exception for characters 1, 2, 7 and 8. For these characters, the bars (dark bars) and spaces (light
-bars) are reduced or enlarged by one-thirteenth of a module to provide a uniform distribution of bar
-width tolerances and thus improve scanning reliability.
-The reduction or enlargement in millimetres at nominal size of the bars (dark bars) and spaces (light
-bars) for the characters 1, 2, 7 and 8 in the number sets A, B and C is shown in figure
-
-
 TODO: Make sure photoshop respects viewBox on import.
 
 TODO: PNG output @ 300 ppi
@@ -220,29 +208,51 @@ const useEncoding = (index, special) => {
     }
 };
 
+const updateSymbolBars = (index, x1, width1, x2, width2) => {
+    const barOneIdx = index * 2;
+    uRect(barOneIdx, 'x', x1);
+    uRect(barOneIdx, 'width', width1);
+    const barTwoIdx = barOneIdx + 1;
+    uRect(barTwoIdx, 'x', x2);
+    uRect(barTwoIdx, 'width', width2);
+};
+
 const setDigit = (index, value, special) => {
     const encoded = encoding[value].slice();
-    const barOneIdx = index * 2;
-    const barTwoIdx = barOneIdx + 1;
     const startX: number = symbolStart(index);
-    switch (useEncoding(index, special)) {
+    const uE = useEncoding(index, special);
+    // bar widths for numbers 1,2,7,8 are adjusted, see: "5.2.3.1 Nominal dimensions of characters"
+    let barWidthAdjust: number = 0.0;
+    if ([1, 2].includes(parseInt(value))) {
+        if (uE === Encoding.A) {
+            barWidthAdjust = 0.077;
+        } else {
+            barWidthAdjust = -0.077;
+        }
+    } else if ([7, 8].includes(parseInt(value))) {
+        if (uE === Encoding.A) {
+            barWidthAdjust = -0.077;
+        } else {
+            barWidthAdjust = 0.077;
+        }
+    }
+    // update symbol bars
+    switch (uE) {
         case Encoding.B:
             encoded.reverse();
         case Encoding.A:
-            // 1
-            uRect(barOneIdx, 'x', startX + encoded[0]);
-            uRect(barOneIdx, 'width', encoded[1]);
-            // 3
-            uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1] + encoded[2]);
-            uRect(barTwoIdx, 'width', encoded[3]);
+            updateSymbolBars(index,
+              startX + encoded[0],
+              encoded[1] + barWidthAdjust,
+              startX + encoded[0] + encoded[1] + encoded[2],
+              encoded[3] + barWidthAdjust);
             break;
         case Encoding.C:
-            // 0
-            uRect(barOneIdx, 'x', startX);
-            uRect(barOneIdx, 'width', encoded[0]);
-            // 2
-            uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1]);
-            uRect(barTwoIdx, 'width', encoded[2]);
+            updateSymbolBars(index,
+              startX,
+              encoded[0] + barWidthAdjust,
+              startX + encoded[0] + encoded[1],
+              encoded[2] + barWidthAdjust);
             break;
     }
 
