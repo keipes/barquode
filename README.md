@@ -1,13 +1,6 @@
 # barquo.de
 Create UPCA and EAN13 barcodes for use on packaging.
 
-
-## Tools
-Some of the build tools aren't properly configured in package.json, so might hit some errors on build until they're installed.
-* typescript compiler
-* uglifyjs (might switch to terser, right now the build compiles both and uses only uglify)
-* npm-watch
-
 ## Build
 ```
 npm install
