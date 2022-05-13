@@ -15,7 +15,7 @@ npm run build
 ```
 
 ## Develop
-Build script is a shell script for now. Styles and javascript are included inline in HTML.
+Not using a bundler at the moment, build script in `scripts/build.ts`.
 
 I'm going for a minimal target size here. No libraries or frameworks are needed by the build artifact. Right now the site is about ~6kB uncompressed.
 
