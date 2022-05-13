@@ -14,6 +14,8 @@ bars) for the characters 1, 2, 7 and 8 in the number sets A, B and C is shown in
 TODO: Make sure photoshop respects viewBox on import.
 
 TODO: PNG output @ 300 ppi
+
+TODO: delete SVG blob from document when download is done
  */
 
 const ns = 'http://www.w3.org/2000/svg';
@@ -99,28 +101,77 @@ const getDigit = (digit, x, y) => {
     us('fill', 'black');
     // us('stroke', 'red');
     us('transform', `translate(${x}, ${y})`)
+    us('opacity', 0);
     // us('x', x);
     // us('y', y);
     svg.appendChild(use);
     return use;
 };
+const digits = [...Array(13).keys()].map(_ => getDigit(0, 0, 0));
 
-getDigit(0, 15, 69);
-getDigit(1, 22, 69);
-getDigit(2, 29, 69);
-getDigit(3, 36, 69);
-getDigit(4, 43, 69);
-getDigit(5, 50, 69);
-getDigit(6, 61, 69);
-getDigit(7, 68, 69);
-getDigit(8, 75, 69);
-getDigit(9, 82, 69);
-getDigit(0, 89, 69);
-getDigit(0, 96, 69);
+const transformDigit = (i: number, x, y, s) => {
+    digits[i].setAttribute('transform', `translate(${x}, ${y}) scale(${s})`);
+};
+const setDigitValue = (i: number, v: number) => {
+    digits[i].setAttribute('d', digitPaths[v]);
+}
+
+const hideDigit = (i: number) => digits[i].setAttribute('opacity', '0');
+const showDigit = (i: number) => digits[i].setAttribute('opacity', '1');
+
+const symbolStart = (index) => {
+    // offset by quiet space, left guard, prior digits
+    let offset = 11 + 3 + (index * 7);
+    // add middle guard width for upper six digits
+    if (index > 5) offset += 5;
+    return offset;
+}
+
+
+const symbolHeight = 69;
+const displayEan13Digits = barcode => {
+    transformDigit(0, 3, symbolHeight, 1);
+    setDigitValue(0, barcode[0]);
+    showDigit(0);
+    for (let i = 1; i < 13; i++) {
+        transformDigit(i, symbolStart(i - 1), symbolHeight, 1);
+        setDigitValue(i, barcode[i]);
+        showDigit(i);
+    }
+};
+
+const displayUpcaOrPartial = barcode => {
+    if (barcode.length > 0) {
+        transformDigit(0, 5, symbolHeight + 4.714, 0.571);
+        showDigit(0);
+    } else {
+        hideDigit(0);
+    }
+    for (let i = 0; i < 12; i++) {
+        if (i < barcode.length) {
+            if (i === 0) {
+                transformDigit(i, 5, symbolHeight + 4.714, 0.571);
+            } else if (i === 11) {
+                transformDigit(i, 107, symbolHeight + 4.714, 0.571);
+            } else {
+                transformDigit(i, symbolStart(i), symbolHeight, 1);
+            }
+            setDigitValue(i, barcode[i]);
+            showDigit(i);
+        } else {
+            hideDigit(i);
+        }
+    }
+    hideDigit(12);
+};
+
+// displayEan13Digits("9501101531000");
+// displayUpcaOrPartial('950110153100');
 
 const listen = (id: string, t: string, cb) => document.getElementById(id).addEventListener(t, cb);
 
 const bcI: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
+// bcI.target.value = '9501101531000';
 bcI.focus();
 
 listen('bc-size', 'input', e => {
@@ -167,14 +218,8 @@ const characterSets = {
     8: [0, 1, 0, 1, 1, 0],
     9: [0, 1, 1, 0, 1, 0],
 };
-const digitStart = (index) => {
-    // offset by quiet space, left guard, prior digits
-    let offset = 11 + 3 + (index * 7);
-    // add middle guard width for upper six digits
-    if (index > 5) offset += 5;
-    return offset;
-}
-const rects = [...Array(24).keys()].map(i => getRect(digitStart(i / 2),0, 0, 69, 'black'));
+
+const rects = [...Array(24).keys()].map(i => getRect(symbolStart(i / 2),0, 0, 69, 'black'));
 // left guard bar
 getRect(11, 0, 1, 74, 'black');
 getRect(13, 0, 1, 74, 'black');
@@ -184,11 +229,6 @@ getRect(59, 0, 1, 74, 'black');
 // right guard bar
 getRect(103, 0, 1, 74, 'black');
 getRect(105, 0, 1, 74, 'black');
-
-
-// for (let i = 0; i < 12; i++) {
-//     console.log(`${i} ${digitStart(i)}`)
-// }
 
 const uRect = (index, key, val) => {
     rects[index].setAttribute(key, val);
@@ -201,7 +241,7 @@ const setDigit = (index, value, special) => {
     let aBMask = (index > 5) ? characterSets[0] : characterSets[special];
     let encoded = encoding[value].slice();
     if (index < 6 && aBMask[i] === 1) encoded.reverse();
-    let startX: number = digitStart(index);
+    let startX: number = symbolStart(index);
 
     let barOneIdx = index * 2;
     let barTwoIdx = barOneIdx + 1;
@@ -232,12 +272,27 @@ const clearDigit = index => {
     uRect(barTwoIdx, 'width', 0);
 };
 
+const setDigitHeight = (index, height) => {
+    let barOneIdx = index * 2;
+    let barTwoIdx = (index * 2) + 1;
+    // uRect(barOneIdx, 'x', 0);
+    uRect(barOneIdx, 'height', height);
+    // uRect(barTwoIdx, 'x', 0);
+    uRect(barTwoIdx, 'height', height);
+};
+
 const maxLength = 13;
 listen('bc', 'input', e => {
     if (e.target.value.length > maxLength) {
         e.target.value = e.target.value.slice(0, maxLength);
     }
-    updateBarcode(e.target.value);
+    const barcode = e.target.value;
+    updateBarcode(barcode);
+    if (barcode.length === maxLength) {
+        displayEan13Digits(barcode);
+    } else {
+        displayUpcaOrPartial(barcode);
+    }
 });
 
 let currentBarcode = "";
@@ -253,6 +308,11 @@ const updateBarcode = barcode => {
         upcViewBox();
     }
     for (const [i, value] of digits.entries()) {
+        if (barcode.length < 13 && (i === 0 || i === 11)) {
+            setDigitHeight(i, 74);
+        } else {
+            setDigitHeight(i, 69);
+        }
         if (curDigits[i] !== value) {
             setDigit(i, value, special);
         }
