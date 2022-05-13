@@ -1,6 +1,4 @@
 /*
-TODO: Make sure photoshop respects viewBox on import.
-
 TODO: PNG output @ 300 ppi
 
 TODO: delete SVG blob from document when download is done
@@ -13,15 +11,14 @@ const ns = 'http://www.w3.org/2000/svg';
 let scale = 2;
 const svg = document.createElementNS(ns, 'svg');
 document.getElementById("barcode").appendChild(svg);
+
+const xDimensionMM = 0.33;
+const horizontalDim = 113;
+const verticalDim = 80; // 69 for normal pattern, 11 additional for guard extensions and characters
 // Characters are scaled to fit in a 7x11 block with padding of .5-1 on all sides.
 // (0, 0) of the box is the upper left corner.
 // These are the characters 0-9 from a creative commons OCRB font created by Matthew Anderson. They have been scaled
 // down, vertically flipped, and translated up. https://web.archive.org/web/20190328165040/https://wehtt.am/ocr-b/
-
-const xDimensionMM = 0.33;
-const horizontalDim = 113;
-const xDimensionIn = 0.0130;
-const verticalDim = 80; // 69 for normal pattern, 11 additional for guard extensions and characters
 const digitPaths = [
     'M 1.0368 5.4528 C 1.0368 8.4768 2.2356 9.7404 3.5208 9.7404 C 4.8492 9.7404 6.0048 8.6064 6.0048 5.4528 C 6.0048 2.472 5.0544 1.2516 3.5208 1.2516 C 2.0412 1.2516 1.0368 2.4936 1.0368 5.4528 Z M 1.9008 5.4528 C 1.9008 3.1092 2.5272 2.1156 3.5208 2.1156 C 4.6332 2.1156 5.1408 3.12 5.1408 5.4528 C 5.1408 7.764 4.6224 8.8548 3.5208 8.8548 C 2.5488 8.8548 1.9008 7.8072 1.9008 5.4528 Z', // 0
     'M 1.3176 3.444 C 1.3176 3.6276 1.512 3.8004 1.7064 3.8004 C 1.8576 3.8004 2.0088 3.6924 2.1384 3.5844 L 3.5532 2.3316 V 9.168 C 3.5532 9.4704 3.6936 9.708 3.9852 9.708 C 4.2768 9.708 4.4172 9.4596 4.4172 9.168 V 1.986 C 4.4172 1.608 4.2444 1.284 3.7908 1.284 C 3.402 1.284 3.1752 1.5 3.024 1.6404 L 1.6092 2.8932 C 1.404 3.0768 1.3176 3.2172 1.3176 3.444 Z', // 1
