@@ -8,7 +8,6 @@ TODO: disable download button when other than 12 or 13 digits are entered
 
 const ns = 'http://www.w3.org/2000/svg';
 
-let scale = 2;
 const svg = document.createElementNS(ns, 'svg');
 document.getElementById("barcode").appendChild(svg);
 
@@ -34,11 +33,10 @@ const digitPaths = [
 
 const svgS = svg.setAttribute.bind(svg);
 svgS('xmlns', ns);
-const updateSvgScale = () => {
+const updateSvgScale = scale => {
     svgS('width', `${xDimensionMM * horizontalDim * scale}mm`);
     svgS('height', `${xDimensionMM * verticalDim * scale}mm`);
 }
-updateSvgScale();
 svgS('preserveAspectRatio', 'none');
 
 const eanViewBox = () => svgS('viewBox', '0 0 113 80');
@@ -134,9 +132,11 @@ const listen = (id: string, t: string, cb) => document.getElementById(id).addEve
 const bcI: HTMLInputElement = <HTMLInputElement> document.getElementById('bc');
 bcI.focus();
 
+const bcS: HTMLInputElement = <HTMLInputElement> document.getElementById('bc-size');
+updateSvgScale(bcS.value);
+
 listen('bc-size', 'input', e => {
-    scale = parseFloat(e.target.value);
-    updateSvgScale();
+    updateSvgScale(parseFloat(e.target.value));
 });
 
 const download = () => {
@@ -149,6 +149,7 @@ const download = () => {
     document.body.removeChild(elem);
 };
 
+const dlButton: HTMLButtonElement = <HTMLButtonElement> document.getElementById('btn-download');
 listen('btn-download', 'click', download);
 
 // GS1 Release 22, Section 5.2.1.2.1, "Symbol character encodation"
@@ -258,9 +259,7 @@ const setDigit = (index, value, special) => {
 const clearDigit = index => {
     let barOneIdx = index * 2;
     let barTwoIdx = (index * 2) + 1;
-    // uRect(barOneIdx, 'x', 0);
     uRect(barOneIdx, 'width', 0);
-    // uRect(barTwoIdx, 'x', 0);
     uRect(barTwoIdx, 'width', 0);
 };
 
@@ -280,17 +279,10 @@ listen('bc', 'input', e => {
     }
     const barcode = e.target.value;
     updateBarcode(barcode);
-    if (barcode.length === maxLength) {
-        displayEan13Digits(barcode);
-    } else {
-        displayUpcaOrPartial(barcode);
-    }
 });
 
-let currentBarcode = "";
 const updateBarcode = barcode => {
     let special = 0;
-    let curDigits = currentBarcode.split('').map(Number);
     let digits = barcode.split('').map(Number);
     if (barcode.length === 13) {
         eanViewBox();
@@ -305,11 +297,21 @@ const updateBarcode = barcode => {
         } else {
             setDigitHeight(i, 69);
         }
-        if (curDigits[i] !== value) {
-            setDigit(i, value, special);
-        }
+        setDigit(i, value, special);
     }
     for (let i = digits.length; i < 12; i++) {
         clearDigit(i);
+    }
+    // Display human readable characters
+    if (barcode.length === maxLength) {
+        displayEan13Digits(barcode);
+    } else {
+        displayUpcaOrPartial(barcode);
+    }
+    // Enable or disable download button
+    if (barcode.length === 13 || barcode.length === 12) {
+        dlButton.disabled = false;
+    } else {
+        dlButton.disabled = true;
     }
 };

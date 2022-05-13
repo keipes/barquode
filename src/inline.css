@@ -83,6 +83,13 @@ h1>a {
     flex-flow: row wrap;
     justify-content: space-around;
 }
+
+button:disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+    color: #aaa;
+}
+
 svg {
     /*width: calc(100% - 4rem);*/
     /*transition: viewBox 1s ease-in-out 1s;*/
@@ -93,8 +100,8 @@ rect {
 }
 
 .button {
-    background-color: #191013;
-    color: #ecedef;
+    background-color: #ccc;
+    color: #333;
     border: none;
     /*color: white;*/
     padding: 8pt 14pt;
@@ -105,9 +112,9 @@ rect {
     white-space: nowrap;
 }
 
-.button:hover {
-    background-color: #202124;
-}
+/*.button:hover {*/
+/*    background-color: #202124;*/
+/*}*/
 
 p {
     text-align: left;
