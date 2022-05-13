@@ -208,33 +208,44 @@ const uRect = (index, key, val) => {
     rects[index].setAttribute(key, val);
 };
 
-const setDigit = (index, value, special) => {
-    // "special" is the extra character encoded in ean13
-    // a value of 0 generates a valid UPCA barcode
-    let i = index > 5 ? index - 5 : index;
-    let aBMask = (index > 5) ? characterSets[0] : characterSets[special];
-    let encoded = encoding[value].slice();
-    if (index < 6 && aBMask[i] === 1) encoded.reverse();
-    let startX: number = symbolStart(index);
+enum Encoding {
+    A, B, C
+}
 
-    let barOneIdx = index * 2;
-    let barTwoIdx = barOneIdx + 1;
-
+const useEncoding = (index, special) => {
     if (index > 5) {
-        // 0
-        uRect(barOneIdx, 'x', startX);
-        uRect(barOneIdx, 'width', encoded[0]);
-        // 2
-        uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1]);
-        uRect(barTwoIdx, 'width', encoded[2]);
+        return Encoding.C;
     } else {
-        // 1
-        uRect(barOneIdx, 'x', startX + encoded[0]);
-        uRect(barOneIdx, 'width', encoded[1]);
-        // 3
-        uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1] + encoded[2]);
-        uRect(barTwoIdx, 'width', encoded[3]);
+        return characterSets[special][index] ? Encoding.B : Encoding.A;
     }
+};
+
+const setDigit = (index, value, special) => {
+    const encoded = encoding[value].slice();
+    const barOneIdx = index * 2;
+    const barTwoIdx = barOneIdx + 1;
+    const startX: number = symbolStart(index);
+    switch (useEncoding(index, special)) {
+        case Encoding.B:
+            encoded.reverse();
+        case Encoding.A:
+            // 1
+            uRect(barOneIdx, 'x', startX + encoded[0]);
+            uRect(barOneIdx, 'width', encoded[1]);
+            // 3
+            uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1] + encoded[2]);
+            uRect(barTwoIdx, 'width', encoded[3]);
+            break;
+        case Encoding.C:
+            // 0
+            uRect(barOneIdx, 'x', startX);
+            uRect(barOneIdx, 'width', encoded[0]);
+            // 2
+            uRect(barTwoIdx, 'x', startX + encoded[0] + encoded[1]);
+            uRect(barTwoIdx, 'width', encoded[2]);
+            break;
+    }
+
 };
 
 const clearDigit = index => {
