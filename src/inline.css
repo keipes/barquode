@@ -158,13 +158,19 @@ p {
     font-size: 10pt;
 }
 p a:link {
-    color: #7d96c6;
+    /*color: #7d96c6;*/
+    color: #999;
 }
+p a:visited {
+    /*color: #8678c6;*/
+    color: #999;
+}
+
 
 p a:hover {
     color: #6898e8;
 }
 
-p a:visited {
-    color: #8678c6;
+P a:active {
+    color: red;
 }
