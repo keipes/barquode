@@ -16,26 +16,38 @@
             <div class="barcode" id="barcode"></div>
         </div>
         <div class="item">
-            <input type="text" name="" id="bc" max="9999999999999" placeholder="digits go here, use the slider to scale">
+            <input type="text" name="" id="bc" >
         </div>
         <div class="item">
-            <input type="range" min="0.8" max="2" value="2" step=".01" class="slider" id="bc-size">
+            <input type="range" min="0.8" max="2" value="1" step=".01" class="slider" id="bc-size">
+        </div>
+        <div class="item">
+            <div class="dim-row">
+                <div class="dim">
+                    <div>S</div>
+                    <div id="scale" class="dim-value">100%</div>
+                </div>
+                <div class="dim">
+                    <div>W</div>
+                    <div id="width" class="dim-value">37.29mm</div>
+                </div>
+                <div class="dim">
+                    <div>H</div>
+                    <div id="height" class="dim-value">37.29mm</div>
+                </div>
+            </div>
         </div>
         <div class="item">
             <div class="button-row">
-<!--                <button class="button" id="btn-reset">Clear Barcode</button>-->
-<!--                <button class="button" id="btn-reset-scale">Reset Scale</button>-->
                 <button class="button" id="btn-download" disabled>Download SVG</button>
             </div>
         </div>
         <div class="item footer">
-            <p>The nominal width for a UPC/EAN barcode is 1.469 inches. The slider on this page allows scaling from 80% to 200% of nominal width as allowed in the specification.<sup><a href="https://www.gs1standards.info/gs1-barcodes/">[1]</a></sup></p>
-
-            <p>This site was built using the GS1 reference materials.<sup><a href="https://www.gs1.org/standards/barcodes-epcrfid-id-keys/gs1-general-specifications">[2]</a></sup> Neither the site nor its author are in any way affiliated with GS1.
-                The barcodes produced by this site are provided for free with no restrictions placed on their use. They are supplied "as-is" with no guarantee of correctness,
-                and are covered by no warranty, express, implied, or otherwise.</p>
-            <p>GS1 Spec<sup><a href="https://www.gs1.org/docs/barcodes/GS1_General_Specifications.pdf">[3]</a></sup></p>
-            <p>OCR-B font face created by Matthew Anderson, licensed under CC-BY 4.0
+            <p>Generates 12 digit UPCA or 13 digit EAN13 barcodes.<sup><a href="https://www.gs1.org/standards/barcodes-epcrfid-id-keys/gs1-general-specifications">[GS1]</a></sup>
+                Neither the site nor its author are in any way affiliated with GS1. The barcodes produced by this site
+                are provided for free with no restrictions placed on their use. They are supplied "as-is" with no
+                guarantee of correctness, and are covered by no warranty, express, implied, or otherwise. Barcodes
+                contain glyphs from the "ocrb" font face created by Matthew Anderson, licensed under CC-BY 4.0
                 <sup><a href="https://creativecommons.org/licenses/by/4.0/">[license]</a></sup>
                 <sup><a href="https://web.archive.org/web/20190328165040/https://wehtt.am/ocr-b/">[archived]</a></sup>
                 <sup><a href="https://wehtt.am/ocr-b/">[original]</a></sup>

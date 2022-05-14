@@ -33,9 +33,20 @@ const digitPaths = [
 
 const svgS = svg.setAttribute.bind(svg);
 svgS('xmlns', ns);
+
+const dimWidth = document.getElementById('width');
+const dimHeight = document.getElementById('height');
+const dimScale = document.getElementById('scale');
+
+const numFormat = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const updateSvgScale = scale => {
-    svgS('width', `${xDimensionMM * horizontalDim * scale}mm`);
-    svgS('height', `${xDimensionMM * verticalDim * scale}mm`);
+    const w = `${numFormat.format(xDimensionMM * horizontalDim * scale)}mm`;
+    const h = `${numFormat.format(xDimensionMM * verticalDim * scale)}mm`;
+    dimWidth.innerText = w;
+    dimHeight.innerText = h;
+    dimScale.innerText = `${Math.round(scale * 100)}%`;
+    svgS('width', w);
+    svgS('height', h);
 }
 svgS('preserveAspectRatio', 'none');
 
