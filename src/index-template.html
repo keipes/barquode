@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>barquo.de</title>
+    <title>Barcode Generator</title>
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAABM9JREFUWEfFV1ksd0cU/w36YF9aD0WoPbRB1e5JLZUS24PYI5ZEiLVCkL6oB0UTEUK0JCRaiQgi+YJQiYcmYpdaQgSJJaidWFpuc8b/3ty/pR+NL87TnTNn5vzmLL+Zy/BMEQRBF8C3AL4G8CWAzwDoKZYfAVgDMAXgdwDvGGPHz9mavc9IEAQbAIUAogGov89eMX8B4DcAPzLGlv5rzZMABEEgZz8AyALw0TMd3zf7G0ANgO8ZYwTqgTwKQBAEawBdAD7/n47vL5sDEM4YW74/8QCAIAjOAPoBfPJKzsVt/gLwDWNsUr6vEgDFyf/4AM7lILzkkZAAKHI+9ophfyqAlA5XsSbkAKoAfEerLi8v0dPTg4WFBXh7e8Pf3/+Vs4GfGGP5tCkHoGi1P6naOzs7kZWVha2tLe5UQ0MD5+fnrw2AuuMLalERQBOAJPIyPDwMPz8/3N7ecqc6Ojo4Pn4Wp7wUZDNjLJkpGG5bTjI2NjZYXr7rGCcnJ0xNTeH6+hpjY2O4urqCp6cn1NUf56S9vT0MDQ1he3sbBgYG8PX1hYmJCT+QioqKHCTxwqcEgBjuV3Hm4uIC2trauLm54ar4+HikpKQgJiYGm5ubXGdhYYGRkREYGxtLG1LdFBcXo66ujoMVRU1NDZqamjg7O0NOTg6qqqjUJIkhAD8DSBFV4+PjcHV1lSwyMzPR0tKCk5MTpRATsNbWVq4jsEFBQejvJ/oAHB0dUVRUBHNzc6Snp2NiYoLrKSL7+/vyfX4hAOMAvhK15CwxMVEyoiLMy8tDSEgIP+Hg4KBUG0dHR2CMobq6Grm5uVzv4eHBU0DrxGitrq5KwKanp+UAJggAMdTHorawsBAVFRWSUWpqKhobG/l4ZmaG14Qoh4eH0NLSgqmpKc85yejoKNzc3Pg3hZ2KWBAEPk5LS0N9fb0cwD4B+AeAqqgNCwvjHCDK4uIibG1t+ZBqgAqKhE5O9TI5OQkvLy+u09PTw8HBAZ8jodC7uLhIe1F0ExIS5ABuHgCg/M3OznIjMzMzrK3RNX8n3d3dCA8P5992dnaYn59HU1MTL1ISisT6+rpk39bWhri4OGk8NzcHe3v7BwCUUmBkZCSFMzg4GL29vXwBVTadVCyosrIylJSUoKamBtnZ2dyGKn53dxf6+vp8XFBQgMrKSv5NbXt6egpVVSnYpOYpUCpCKysrrKys8EVizqgDkpKSQCxJYmlpCSomyn97ezuio6mT7yQ2NpZ3ABFafn4+5w0SkU/kx6csPWjD5ORkNDc3cztnZ2eef2ovyq0Y5r6+Pp4Ckp2dHR56ee+LJybiEWk8IiJCOoAMBG9DJSLa2Njg7LW0pPySohASuNLSUinE4kaUBiIZsdqp3yn/UVFREo1nZGSgtrb2XgDAiYgem0pUTGEbGBgAdQCJtbU1fHx8oKtLpo8LERiF3dDQEKGhoTzfVMSiUHuXl5fLF99RMWkEQZAuoyc9vHCC0hYYGCitIjDUBUTLCrm7jBQA6OXLr+MX+nnSvKOjA5GRkdK8g4MDurq6+D0CQPk6VoCQHiSvAYLS2NDQAKJrd3d3BAQEyG9D5QeJAgDdr2/3JFOAoOf42zxKxbC/6bNcBuLtfkxkIN7u10zeBW/2c3q/FT/U7/m/PfIciRt9pd0AAAAASUVORK5CYII=" />
     <style><!-- {{{ styles }}} --></style>
 </head>
 <body>
 <div class="wrapper">
     <div class="container">
         <div class="item">
-            <h1><a href="." title="Click me to reset everything!">barquo/de</a></h1>
+            <h1><a href=".">barquo/de</a></h1>
         </div>
         <div class="item">
             <div class="barcode" id="barcode"></div>
         </div>
         <div class="item">
-            <input type="number" name="" id="bc" max="9999999999999" placeholder="digits go here, use the slider to scale">
+            <input type="text" name="" id="bc" max="9999999999999" placeholder="digits go here, use the slider to scale">
         </div>
         <div class="item">
             <input type="range" min="0.8" max="2" value="2" step=".01" class="slider" id="bc-size">

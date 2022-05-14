@@ -272,11 +272,22 @@ const setDigitHeight = (index, height) => {
     uRect(barTwoIdx, 'height', height);
 };
 
+/**
+ * Trim to max of 13 characters and remove non-digits.
+ * @param input
+ */
+const filterInput = input => {
+    return input.replace(/\D/g,'').slice(0, 13);
+}
+
 const maxLength = 13;
 listen('bc', 'input', e => {
-    if (e.target.value.length > maxLength) {
-        e.target.value = e.target.value.slice(0, maxLength);
-    }
+    // console.log(bcI.);
+    e.target.value = filterInput(e.target.value);
+
+    // if (e.target.value.length > maxLength) {
+    //     e.target.value = e.target.value.slice(0, maxLength);
+    // }
     const barcode = e.target.value;
     updateBarcode(barcode);
 });
