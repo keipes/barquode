@@ -66,16 +66,12 @@ h1>a {
 }
 
 #bc {
-    width: 10rem;
+    width: 12rem;
     text-align: center;
-    /*border: none;*/
     padding: .4rem;
     border-radius: .4rem;
-    /*background-color: #efefef;*/
-    /*margin-top: 1rem;*/
     font-size: 16pt;
     font-family: monospace;
-    /*outline: #333 auto 1px;*/
 }
 
 #bc-size {
@@ -96,8 +92,6 @@ h1>a {
     justify-content: space-around;
     margin-top: 1rem;
 }
-
-
 
 rect {
     transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;
