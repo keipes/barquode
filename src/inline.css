@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
     font-family: sans-serif;
-    color: #abacad;
+    /*color: #abacad;*/
     min-height: 100%;
 }
 
@@ -10,10 +10,6 @@ body {
 }
 
 .wrapper {
-    /*background-color: #35373a;*/
-    background-color: #111212;
-
-    min-height: 100%;
     padding: 0;
     margin: 0;
     display: flex;
@@ -22,9 +18,15 @@ body {
 }
 
 .container {
-    width: 600px;
+    /*min-height: 100%;*/
+    width: 40em;
     display: grid;
-    gap: 2rem;
+    gap: 1rem;
+}
+
+svg {
+    width: 40em;
+    height: auto;
 }
 
 @media
@@ -37,6 +39,9 @@ and (max-device-width: 1200px)
     .container {
         width: calc(100% - 4rem);
     }
+    svg {
+        width: calc(100% - 4rem);
+    }
 }
 
 .item {
@@ -45,11 +50,11 @@ and (max-device-width: 1200px)
 }
 
 h1>a {
-    color: #cdcecf;
-    /*color: #202124;*/
+    color: #222;
     font-size: 24pt;
     font-family: sans-serif;
     text-decoration: none;
+    margin: 0;
 }
 
 #bc {
@@ -57,11 +62,11 @@ h1>a {
     border: none;
     padding: .4rem;
     border-radius: .4rem;
-    background-color: #202124;
+    background-color: #eee;
     margin-top: 1rem;
     font-size: 16pt;
     font-family: monospace;
-    color: #cdcecf;
+    color: #222;
 }
 
 #bc-size {
@@ -70,7 +75,7 @@ h1>a {
 
 .barcode {
     width: 100%;
-    height: 30rem;
+    /*height: 30rem;*/
     background-color: #202124;
     border-radius: .4rem;
     display: flex;
@@ -90,17 +95,13 @@ button:disabled {
     color: #aaa;
 }
 
-svg {
-    /*width: calc(100% - 4rem);*/
-    /*transition: viewBox 1s ease-in-out 1s;*/
-}
 
 rect {
     transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;
 }
 
 .button {
-    background-color: #ccc;
+    background-color: #eee;
     color: #333;
     border: none;
     /*color: white;*/
