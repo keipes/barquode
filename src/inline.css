@@ -79,6 +79,7 @@ h1>a {
 }
 
 .barcode {
+    margin-top: 2rem;
     width: 100%;
     border-radius: .4rem;
     display: flex;
@@ -154,16 +155,16 @@ p {
 .footer {
     margin-top: 3rem;
     margin-bottom: 2rem;
-    color: #999;
+    color: #aaa;
     font-size: 10pt;
 }
 p a:link {
     /*color: #7d96c6;*/
-    color: #999;
+    color: #aaa;
 }
 p a:visited {
     /*color: #8678c6;*/
-    color: #999;
+    color: #aaa;
 }
 
 
