@@ -46,7 +46,11 @@ and (max-device-width: 1200px)
     svg {
         width: calc(100% - 4rem);
     }
+    .wrapper {
+        width: calc(100% - 4rem);
+    }
 }
+
 
 .item {
     justify-content: center;
