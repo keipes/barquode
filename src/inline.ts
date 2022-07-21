@@ -10,6 +10,8 @@ const ns = 'http://www.w3.org/2000/svg';
 
 const svg = document.createElementNS(ns, 'svg');
 document.getElementById("barcode").appendChild(svg);
+const group = document.createElementNS(ns, 'g');
+svg.appendChild(group);
 
 const xDimensionMM = 0.33;
 const horizontalDim = 113;
@@ -66,7 +68,7 @@ const createRect = (x, y, width, height, color) => {
 };
 
 // Create background (white rectangle).
-svg.appendChild(createRect(0, 0, 115, 80, 'white'));
+group.appendChild(createRect(0, 0, 115, 80, 'white'));
 
 const createDigit = (digit, x, y) => {
     const digitPath = document.createElementNS(ns, 'path');
@@ -74,9 +76,6 @@ const createDigit = (digit, x, y) => {
     modifyDigit('d', digitPaths[digit]);
     modifyDigit('fill', 'black');
     modifyDigit('transform', `translate(${x}, ${y})`)
-    // modifyDigit('opacity', 0);
-
-    // svg.appendChild(digitPath);
     return digitPath;
 };
 const digits = [...Array(13).keys()].map(_ => createDigit(0, 0, 0));
@@ -90,7 +89,7 @@ const setDigitValue = (i: number, v: number) => {
 
 // Show or hide digits by adding or removing them from the dom.
 const hideDigit = (i: number) => digits[i].remove();
-const showDigit = (i: number) => svg.contains(digits[i]) ? null : svg.appendChild(digits[i]);
+const showDigit = (i: number) => group.contains(digits[i]) ? null : group.appendChild(digits[i]);
 
 const symbolStart = (index) => {
     // offset by quiet space, left guard, prior digits
@@ -191,14 +190,14 @@ const characterSets = {
 
 const rects = [...Array(24).keys()].map(i => createRect(symbolStart(i / 2),0, 0, 69, 'black'));
 // left guard bar
-svg.appendChild(createRect(11, 0, 1, 74, 'black'));
-svg.appendChild(createRect(13, 0, 1, 74, 'black'));
+group.appendChild(createRect(11, 0, 1, 74, 'black'));
+group.appendChild(createRect(13, 0, 1, 74, 'black'));
 // middle guard
-svg.appendChild(createRect(57, 0, 1, 74, 'black'));
-svg.appendChild(createRect(59, 0, 1, 74, 'black'));
+group.appendChild(createRect(57, 0, 1, 74, 'black'));
+group.appendChild(createRect(59, 0, 1, 74, 'black'));
 // right guard bar
-svg.appendChild(createRect(103, 0, 1, 74, 'black'));
-svg.appendChild(createRect(105, 0, 1, 74, 'black'));
+group.appendChild(createRect(103, 0, 1, 74, 'black'));
+group.appendChild(createRect(105, 0, 1, 74, 'black'));
 
 enum Encoding {
     A, B, C
@@ -243,6 +242,7 @@ const setDigit = (index, value, special) => {
     switch (uE) {
         case Encoding.B:
             encoded.reverse();
+            // intentional fallthrough to A case
         case Encoding.A:
             updateSymbolBars(index,
               startX + encoded[0],
@@ -279,9 +279,9 @@ const hideBars = index => {
 
 const showBars = index => {
     const bars = getBars(index);
-    if (!svg.contains(bars.a)) {
-        svg.appendChild(bars.a);
-        svg.appendChild(bars.b);
+    if (!group.contains(bars.a)) {
+        group.appendChild(bars.a);
+        group.appendChild(bars.b);
     }
 }
 
