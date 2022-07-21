@@ -67,21 +67,18 @@ const getRect = (x, y, width, height, color) => {
 };
 let backgroundRect = getRect(0, 0, 115, 80, 'white');
 
-const getDigit = (digit, x, y) => {
-    const use = document.createElementNS(ns, 'path');
-    const us = use.setAttribute.bind(use);
-    // us('href', `#${digit}`);
-    us('d', digitPaths[digit]);
-    us('fill', 'black');
-    // us('stroke', 'red');
-    us('transform', `translate(${x}, ${y})`)
-    us('opacity', 0);
-    // us('x', x);
-    // us('y', y);
-    svg.appendChild(use);
-    return use;
+const createDigit = (digit, x, y) => {
+    const digitPath = document.createElementNS(ns, 'path');
+    const modifyDigit = digitPath.setAttribute.bind(digitPath);
+    modifyDigit('d', digitPaths[digit]);
+    modifyDigit('fill', 'black');
+    modifyDigit('transform', `translate(${x}, ${y})`)
+    // modifyDigit('opacity', 0);
+
+    // svg.appendChild(digitPath);
+    return digitPath;
 };
-const digits = [...Array(13).keys()].map(_ => getDigit(0, 0, 0));
+const digits = [...Array(13).keys()].map(_ => createDigit(0, 0, 0));
 
 const transformDigit = (i: number, x, y, s) => {
     digits[i].setAttribute('transform', `translate(${x}, ${y}) scale(${s})`);
@@ -90,8 +87,16 @@ const setDigitValue = (i: number, v: number) => {
     digits[i].setAttribute('d', digitPaths[v]);
 }
 
-const hideDigit = (i: number) => digits[i].setAttribute('opacity', '0');
-const showDigit = (i: number) => digits[i].setAttribute('opacity', '1');
+// Show or hide digits by adding or removing them from the dom.
+const hideDigit = (i: number) => digits[i].remove();
+const showDigit = (i: number) => {
+    if (svg.contains(digits[i])) {
+        console.debug(`Digit #${i} is already in the svg.`);
+    } else {
+        console.debug(`Appending digit #${i} to the svg.`);
+        svg.appendChild(digits[i]);
+    }
+};
 
 const symbolStart = (index) => {
     // offset by quiet space, left guard, prior digits
