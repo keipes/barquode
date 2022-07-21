@@ -99,7 +99,7 @@ h1>a {
 }
 
 rect {
-    transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;
+    /*transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;*/
     -webkit-animation: fadein 300ms; /* Safari, Chrome and Opera > 12.1 */
        -moz-animation: fadein 300ms; /* Firefox < 16 */
         -ms-animation: fadein 300ms; /* Internet Explorer */

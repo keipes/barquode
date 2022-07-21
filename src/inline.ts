@@ -90,7 +90,7 @@ const setDigitValue = (i: number, v: number) => {
 
 // Show or hide digits by adding or removing them from the dom.
 const hideDigit = (i: number) => digits[i].remove();
-const showDigit = (i: number) => svg.appendChild(digits[i]);
+const showDigit = (i: number) => svg.contains(digits[i]) ? null : svg.appendChild(digits[i]);
 
 const symbolStart = (index) => {
     // offset by quiet space, left guard, prior digits
@@ -200,10 +200,6 @@ svg.appendChild(createRect(59, 0, 1, 74, 'black'));
 svg.appendChild(createRect(103, 0, 1, 74, 'black'));
 svg.appendChild(createRect(105, 0, 1, 74, 'black'));
 
-const uRect = (index, key, val) => {
-    rects[index].setAttribute(key, val);
-};
-
 enum Encoding {
     A, B, C
 }
@@ -217,12 +213,11 @@ const useEncoding = (index, special) => {
 };
 
 const updateSymbolBars = (index, x1, width1, x2, width2) => {
-    const barOneIdx = index * 2;
-    uRect(barOneIdx, 'x', x1);
-    uRect(barOneIdx, 'width', width1);
-    const barTwoIdx = barOneIdx + 1;
-    uRect(barTwoIdx, 'x', x2);
-    uRect(barTwoIdx, 'width', width2);
+    const bars = getBars(index);
+    bars.setA('x', x1);
+    bars.setA('width', width1);
+    bars.setB('x', x2);
+    bars.setB('width', width2);
 };
 
 const setDigit = (index, value, special) => {
@@ -266,23 +261,20 @@ const setDigit = (index, value, special) => {
 
 };
 
-const getBars = function (index): {a: Element, b: Element, aIndex: number, bIndex: number} {
-    const aIndex = index * 2;
-    const bIndex = aIndex + 1;
-    return {
-        a: rects[aIndex],
-        b: rects[bIndex],
-        aIndex,
-        bIndex
-    }
+type AttributeSetter = (key: string, val: object) => void;
+
+const getBars = function (index): { a: Element, b: Element, setA: AttributeSetter, setB: AttributeSetter} {
+    const aIndex = index * 2,
+      bIndex = aIndex + 1,
+      a = rects[aIndex],
+      b = rects[bIndex];
+    return {a, b, setA: a.setAttribute.bind(a), setB: b.setAttribute.bind(b)};
 }
 
 const hideBars = index => {
     const bars = getBars(index);
     bars.a.remove();
     bars.b.remove();
-    uRect(bars.aIndex, 'width', 0);
-    uRect(bars.bIndex, 'width', 0);
 };
 
 const showBars = index => {
@@ -295,8 +287,8 @@ const showBars = index => {
 
 const setDigitHeight = (index, height) => {
     const bars = getBars(index);
-    uRect(bars.aIndex, 'height', height);
-    uRect(bars.bIndex, 'height', height);
+    bars.setA('height', height);
+    bars.setB('height', height);
 };
 
 /**
@@ -309,12 +301,7 @@ const filterInput = input => {
 
 const maxLength = 13;
 listen('bc', 'input', e => {
-    // console.log(bcI.);
     e.target.value = filterInput(e.target.value);
-
-    // if (e.target.value.length > maxLength) {
-    //     e.target.value = e.target.value.slice(0, maxLength);
-    // }
     const barcode = e.target.value;
     updateBarcode(barcode);
 });
