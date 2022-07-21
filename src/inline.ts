@@ -52,8 +52,22 @@ const updateSvgScale = scale => {
 }
 svgS('preserveAspectRatio', 'none');
 
-const eanViewBox = () => svgS('viewBox', '0 0 113 80');
-const upcViewBox = () => svgS('viewBox', '2 0 113 80');
+let isUpcViewBox = false;
+// const eanViewBox = () => isUpcViewBox ? svgS('viewBox', '0 0 113 80') : null;
+// const upcViewBox = () => isUpcViewBox ? null : svgS('viewBox', '2 0 113 80');
+
+const eanViewBox = () => {
+    if (isUpcViewBox) {
+        svgS('viewBox', '0 0 113 80');
+        isUpcViewBox = false;
+    }
+};
+const upcViewBox = () => {
+    if (!isUpcViewBox) {
+        svgS('viewBox', '2 0 113 80');
+        isUpcViewBox = true;
+    }
+};
 upcViewBox();
 
 const createRect = (x, y, width, height, color) => {
@@ -80,11 +94,19 @@ const createDigit = (digit, x, y) => {
 };
 const digits = [...Array(13).keys()].map(_ => createDigit(0, 0, 0));
 
+const digitTransform: string[] = [];
 const transformDigit = (i: number, x, y, s) => {
-    digits[i].setAttribute('transform', `translate(${x}, ${y}) scale(${s})`);
+    const transform = `translate(${x}, ${y}) scale(${s})`;
+    if (digitTransform[i] != transform)
+    digits[i].setAttribute('transform', transform);
+    digitTransform[i] = transform;
 };
+const digitValue: number[] = [];
 const setDigitValue = (i: number, v: number) => {
-    digits[i].setAttribute('d', digitPaths[v]);
+    if (digitValue[i] !== v) {
+        digits[i].setAttribute('d', digitPaths[v]);
+        digitValue[i] = v;
+    }
 }
 
 // Show or hide digits by adding or removing them from the dom.
@@ -211,12 +233,23 @@ const useEncoding = (index, special) => {
     }
 };
 
-const updateSymbolBars = (index, x1, width1, x2, width2) => {
+interface SymbolBars {
+    aX: number,
+    aWidth: number,
+    bX: number,
+    bWidth: number
+}
+const symbolBarAttrs: SymbolBars[] = [];
+const updateSymbolBars = (index, aX, aWidth, bX, bWidth) => {
     const bars = getBars(index);
-    bars.setA('x', x1);
-    bars.setA('width', width1);
-    bars.setB('x', x2);
-    bars.setB('width', width2);
+    const attrs = symbolBarAttrs[index];
+    if (attrs == null || attrs.aX != aX || attrs.aWidth != aWidth || attrs.bX != bX || attrs.bWidth != bWidth) {
+        bars.setA('x', aX);
+        bars.setA('width', aWidth);
+        bars.setB('x', bX);
+        bars.setB('width', bWidth);
+        symbolBarAttrs[index] = {aX, aWidth, bX, bWidth};
+    }
 };
 
 const setDigit = (index, value, special) => {
@@ -285,10 +318,14 @@ const showBars = index => {
     }
 }
 
-const setDigitHeight = (index, height) => {
-    const bars = getBars(index);
-    bars.setA('height', height);
-    bars.setB('height', height);
+const barHeights = [];
+const setBarHeight = (index, height) => {
+    if (barHeights[index] !== height) {
+        const bars = getBars(index);
+        bars.setA('height', height);
+        bars.setB('height', height);
+        barHeights[index] = height;
+    }
 };
 
 /**
@@ -318,9 +355,9 @@ const updateBarcode = barcode => {
     }
     for (const [i, value] of digits.entries()) {
         if (barcode.length < 13 && (i === 0 || i === 11)) {
-            setDigitHeight(i, 74);
+            setBarHeight(i, 74);
         } else {
-            setDigitHeight(i, 69);
+            setBarHeight(i, 69);
         }
         showBars(i);
         setDigit(i, value, special);
