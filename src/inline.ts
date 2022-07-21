@@ -2,16 +2,12 @@
 TODO: PNG output @ 300 ppi
 
 TODO: delete SVG blob from document when download is done
-
-TODO: disable download button when other than 12 or 13 digits are entered
  */
 
 const ns = 'http://www.w3.org/2000/svg';
 
-const svg = document.createElementNS(ns, 'svg');
-document.getElementById("barcode").appendChild(svg);
-const group = document.createElementNS(ns, 'g');
-svg.appendChild(group);
+const svg = document.getElementsByTagNameNS(ns, 'svg')[0];
+const group = document.getElementsByTagNameNS(ns, 'g')[0];
 
 const xDimensionMM = 0.33;
 const horizontalDim = 113;
@@ -34,7 +30,6 @@ const digitPaths = [
 ];
 
 const svgS = svg.setAttribute.bind(svg);
-svgS('xmlns', ns);
 
 const dimWidth = document.getElementById('width');
 const dimHeight = document.getElementById('height');
@@ -50,12 +45,8 @@ const updateSvgScale = scale => {
     svgS('width', w);
     svgS('height', h);
 }
-svgS('preserveAspectRatio', 'none');
 
 let isUpcViewBox = false;
-// const eanViewBox = () => isUpcViewBox ? svgS('viewBox', '0 0 113 80') : null;
-// const upcViewBox = () => isUpcViewBox ? null : svgS('viewBox', '2 0 113 80');
-
 const eanViewBox = () => {
     if (isUpcViewBox) {
         svgS('viewBox', '0 0 113 80');
@@ -80,9 +71,6 @@ const createRect = (x, y, width, height, color) => {
     rs('fill', color);
     return rect;
 };
-
-// Create background (white rectangle).
-group.appendChild(createRect(0, 0, 115, 80, 'white'));
 
 const createDigit = (digit, x, y) => {
     const digitPath = document.createElementNS(ns, 'path');
