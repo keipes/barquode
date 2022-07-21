@@ -100,6 +100,34 @@ h1>a {
 
 rect {
     transition: width ease-in-out 300ms, x 300ms ease-in-out 0ms;
+    -webkit-animation: fadein 300ms; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: fadein 300ms; /* Firefox < 16 */
+        -ms-animation: fadein 300ms; /* Internet Explorer */
+         -o-animation: fadein 300ms; /* Opera < 12.1 */
+            animation: fadein 300ms;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .button {

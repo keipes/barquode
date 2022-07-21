@@ -54,7 +54,7 @@ const eanViewBox = () => svgS('viewBox', '0 0 113 80');
 const upcViewBox = () => svgS('viewBox', '2 0 113 80');
 upcViewBox();
 
-const getRect = (x, y, width, height, color) => {
+const createRect = (x, y, width, height, color) => {
     const rect = document.createElementNS(ns, 'rect');
     const rs = rect.setAttribute.bind(rect);
     rs('x', x);
@@ -62,10 +62,11 @@ const getRect = (x, y, width, height, color) => {
     rs('width', width);
     rs('height', height);
     rs('fill', color);
-    svg.appendChild(rect);
     return rect;
 };
-let backgroundRect = getRect(0, 0, 115, 80, 'white');
+
+// Create background (white rectangle).
+svg.appendChild(createRect(0, 0, 115, 80, 'white'));
 
 const createDigit = (digit, x, y) => {
     const digitPath = document.createElementNS(ns, 'path');
@@ -89,14 +90,7 @@ const setDigitValue = (i: number, v: number) => {
 
 // Show or hide digits by adding or removing them from the dom.
 const hideDigit = (i: number) => digits[i].remove();
-const showDigit = (i: number) => {
-    if (svg.contains(digits[i])) {
-        console.debug(`Digit #${i} is already in the svg.`);
-    } else {
-        console.debug(`Appending digit #${i} to the svg.`);
-        svg.appendChild(digits[i]);
-    }
-};
+const showDigit = (i: number) => svg.appendChild(digits[i]);
 
 const symbolStart = (index) => {
     // offset by quiet space, left guard, prior digits
@@ -195,16 +189,16 @@ const characterSets = {
     9: [0, 1, 1, 0, 1, 0],
 };
 
-const rects = [...Array(24).keys()].map(i => getRect(symbolStart(i / 2),0, 0, 69, 'black'));
+const rects = [...Array(24).keys()].map(i => createRect(symbolStart(i / 2),0, 0, 69, 'black'));
 // left guard bar
-getRect(11, 0, 1, 74, 'black');
-getRect(13, 0, 1, 74, 'black');
+svg.appendChild(createRect(11, 0, 1, 74, 'black'));
+svg.appendChild(createRect(13, 0, 1, 74, 'black'));
 // middle guard
-getRect(57, 0, 1, 74, 'black');
-getRect(59, 0, 1, 74, 'black');
+svg.appendChild(createRect(57, 0, 1, 74, 'black'));
+svg.appendChild(createRect(59, 0, 1, 74, 'black'));
 // right guard bar
-getRect(103, 0, 1, 74, 'black');
-getRect(105, 0, 1, 74, 'black');
+svg.appendChild(createRect(103, 0, 1, 74, 'black'));
+svg.appendChild(createRect(105, 0, 1, 74, 'black'));
 
 const uRect = (index, key, val) => {
     rects[index].setAttribute(key, val);
@@ -272,20 +266,37 @@ const setDigit = (index, value, special) => {
 
 };
 
-const clearDigit = index => {
-    let barOneIdx = index * 2;
-    let barTwoIdx = (index * 2) + 1;
-    uRect(barOneIdx, 'width', 0);
-    uRect(barTwoIdx, 'width', 0);
+const getBars = function (index): {a: Element, b: Element, aIndex: number, bIndex: number} {
+    const aIndex = index * 2;
+    const bIndex = aIndex + 1;
+    return {
+        a: rects[aIndex],
+        b: rects[bIndex],
+        aIndex,
+        bIndex
+    }
+}
+
+const hideBars = index => {
+    const bars = getBars(index);
+    bars.a.remove();
+    bars.b.remove();
+    uRect(bars.aIndex, 'width', 0);
+    uRect(bars.bIndex, 'width', 0);
 };
 
+const showBars = index => {
+    const bars = getBars(index);
+    if (!svg.contains(bars.a)) {
+        svg.appendChild(bars.a);
+        svg.appendChild(bars.b);
+    }
+}
+
 const setDigitHeight = (index, height) => {
-    let barOneIdx = index * 2;
-    let barTwoIdx = (index * 2) + 1;
-    // uRect(barOneIdx, 'x', 0);
-    uRect(barOneIdx, 'height', height);
-    // uRect(barTwoIdx, 'x', 0);
-    uRect(barTwoIdx, 'height', height);
+    const bars = getBars(index);
+    uRect(bars.aIndex, 'height', height);
+    uRect(bars.bIndex, 'height', height);
 };
 
 /**
@@ -324,10 +335,11 @@ const updateBarcode = barcode => {
         } else {
             setDigitHeight(i, 69);
         }
+        showBars(i);
         setDigit(i, value, special);
     }
     for (let i = digits.length; i < 12; i++) {
-        clearDigit(i);
+        hideBars(i);
     }
     // Display human readable characters
     if (barcode.length === maxLength) {
